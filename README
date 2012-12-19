@@ -19,7 +19,7 @@ usage::
 
   from cryptopan import CryptoPan
   c=CryptoPan("".join([chr(x) for x in range(0,32)]))
-  c.anonymize("192.0.2.0")
+  print c.anonymize("192.0.2.0")
 
 Acknowledgements
 ----------------
