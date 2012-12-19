@@ -10,6 +10,14 @@ Based on IP::Anonymous by John Kristoff
 * http://search.cpan.org/dist/IP-Anonymous/lib/IP/Anonymous.pm
 
 
+usage:
+```python
+
+from cryptopan import CryptoPan
+c=CryptoPan("".join([chr(x) for x in range(0,32)]))
+c.anonymize("192.0.2.0")
+```
+
 Acknowledgements
 ----------------
 
