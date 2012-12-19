@@ -1,0 +1,28 @@
+PyCrypto-PAn
+============
+
+A IP address anonymizer in Python using the `Crypot-PAn`_ algorithm.
+Based on `IP::Anonymous`_ by John Kristoff 
+
+.. _IP::Anonymous: http://search.cpan.org/dist/IP-Anonymous/lib/IP/Anonymous.pm
+.. _Crypto-PAn: http://www.cc.gatech.edu/computing/Telecomm/projects/cryptopan/
+
+requirements:
+  
+  * pycrypto ``pip install pycrypto``
+
+installation::
+  
+  python setup.py install
+
+usage::
+
+  from cryptopan import CryptoPan
+  c=CryptoPan("".join([chr(x) for x in range(0,32)]))
+  c.anonymize("192.0.2.0")
+
+Acknowledgements
+----------------
+
+This work was funded by the EU FP7 Project `CONFINE`_
+.. _CONFINE: http://www.confine-project.eu
