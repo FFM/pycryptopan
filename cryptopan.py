@@ -28,23 +28,25 @@ class CryptoPan():
     address=[int(x) for x in ip.split(".")]
     if len(address)!=4:
       raise CryptoPanError("Invalid IPv4 Address")
-    
+   
     address=self.toint(address)
-    rin_input="".join([chr(x) for x in self.first4bytes_pad])
-    rin_input=rin_input+self.pad[4:]
-    rin_output=self.aes.encrypt(rin_input)
-    result = result | ord(rin_output[0])>>7<<31
-    for position in range(1,32):
-      first4bytes_input = ((address >> (32-position)) << (32-position)) | (((self.toint(self.first4bytes_pad) << position) & 0xFFFFFFFF) >> position)
+    
+    def calc(a,result,offset):
+      inp= "".join([chr(x) for x in a])+self.pad[4:]
+      rin_output=self.aes.encrypt(inp)
+      return result |  ord(rin_output[0])>>7 <<offset
 
-      rin_input="".join([chr(x) for x in self.toarray(first4bytes_input)])
-      rin_input=rin_input+self.pad[4:]
-      rin_output=[ord(x) for x in self.aes.encrypt(rin_input)]
-      result = result | (rin_output[0]>>7) << (31-position)
+    result=calc(self.first4bytes_pad,result,31)
+    for position in range(1,32):
+      mask = 0xFFFFFFFF >> (32-position) << (32-position)
+      first4bytes_input = (address & mask) | (self.toint(self.first4bytes_pad) & (~ mask))
+      result=calc(self.toarray(first4bytes_input),result,31-position)
     
     return ".".join(["%s"%x for x in self.toarray(result ^ address)])
 
 
 if __name__=="__main__":
   c=CryptoPan("".join([chr(x) for x in range(0,32)]))
-  print c.anonymize("192.0.2.1")
+  print "expected: 2.90.93.17"
+
+  print "calculated: "+c.anonymize("192.0.2.1")
