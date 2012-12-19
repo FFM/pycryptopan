@@ -30,7 +30,6 @@ class CryptoPan():
       raise CryptoPanError("Invalid IPv4 Address")
     
     address=self.toint(address)
-    print address
     rin_input="".join([chr(x) for x in self.first4bytes_pad])
     rin_input=rin_input+self.pad[4:]
     rin_output=self.aes.encrypt(rin_input)
@@ -43,4 +42,9 @@ class CryptoPan():
       rin_output=[ord(x) for x in self.aes.encrypt(rin_input)]
       result = result | (rin_output[0]>>7) << (31-position)
     
-    return ".".join(["%s"%x for x in self.toarray(result)])
+    return ".".join(["%s"%x for x in self.toarray(result ^ address)])
+
+
+if __name__=="__main__":
+  c=CryptoPan("".join([chr(x) for x in range(0,32)]))
+  print c.anonymize("192.0.2.1")
