@@ -1,7 +1,7 @@
 PyCrypto-PAn
 ============
 
-A IP address anonymizer in Python using the `Crypot-PAn`_ algorithm.
+A IP address anonymizer in Python using the `Crypto-PAn`_ algorithm.
 Based on `IP::Anonymous`_ by John Kristoff 
 
 .. _IP::Anonymous: http://search.cpan.org/dist/IP-Anonymous/lib/IP/Anonymous.pm
