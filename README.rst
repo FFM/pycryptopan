@@ -9,7 +9,7 @@ Based on `IP::Anonymous`_ by John Kristoff
 
 requirements:
   
-  * pycrypto ``pip install pycrypto``
+* pycrypto ``pip install pycrypto``
 
 installation::
   
@@ -25,4 +25,5 @@ Acknowledgements
 ----------------
 
 This work was funded by the EU FP7 Project `CONFINE`_
+
 .. _CONFINE: http://www.confine-project.eu
