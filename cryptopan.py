@@ -45,7 +45,14 @@ class CryptoPan():
 
 
 if __name__=="__main__":
+  import time
   c=CryptoPan("".join((chr(x) for x in range(0,32))))
   print "expected: 2.90.93.17"
 
   print "calculated: "+c.anonymize("192.0.2.1")
+  print "starting performance check"
+  stime=time.time()
+  for i in range(0,1000):
+    c.anonymize("192.0.2.1")
+  dtime=time.time()-stime
+  print "1000 anonymizations in %s s"%dtime
