@@ -15,6 +15,7 @@ class CryptoPan():
     self.aes=AES(key[0:16])
     self.pad=self.aes.encrypt(key[16:32])
     self.first4bytes_pad=self.toint([ord(x) for x in self.pad[0:4]])
+    self.masks=[0xFFFFFFFF >> (32-p) << (32-p) for p in range(0,32)]
 
   def toint(self,array):  
     return array[0]<<24|array[1]<<16|array[2]<<8|array[3]
@@ -37,12 +38,11 @@ class CryptoPan():
       rin_output=self.aes.encrypt(inp)
       return ord(rin_output[0])>>7 
     
-    def prep_addr(p,address):
+    def prep_addr(mask,address):
       """ prepare adress for calculation """
-      mask = 0xFFFFFFFF >> (32-p) << (32-p)
       return (address & mask) | (self.first4bytes_pad & (~ mask))
 
-    addresses=[prep_addr(p,address) for p in range(0,32)]
+    addresses=[prep_addr(mask,address) for mask in self.masks]
     result=reduce(lambda x,y: x<<1 | y, [calc(a) for a in addresses],0)
     
     return ".".join(["%s"%x for x in self.toarray(result ^ address)])
