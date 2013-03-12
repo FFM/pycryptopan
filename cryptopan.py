@@ -1,3 +1,4 @@
+from functools import reduce
 from Crypto.Cipher.AES import AESCipher as AES
 
 class CryptoPanError(Exception):
@@ -14,7 +15,13 @@ class CryptoPan():
       raise CryptoPanError("Key must be a 32 byte long string")
     self.aes=AES(key[0:16])
     self.pad=self.aes.encrypt(key[16:32])
-    f4bp=self.toint([ord(x) for x in self.pad[0:4]])
+
+    f4=self.pad[0:4]
+    # Python 2 requires explicit conversion to ints
+    if isinstance(f4, str):
+      f4=[ord(x) for x in f4]
+      
+    f4bp=self.toint(f4)
     self.masks=[(mask,f4bp & (~ mask)) for mask in (0xFFFFFFFF >> (32-p) << (32-p) for p in range(0,32))]
 
   def toint(self,array):  
@@ -34,9 +41,23 @@ class CryptoPan():
     
     def calc(a):
       """ calculate the first bit for Crypto-PAN"""
-      inp= "".join((chr(x) for x in self.toarray(a)))+self.pad[4:]
+      a_array = self.toarray(a)
+
+      # Python 2 requires converting ints to chars one at a time
+      if isinstance(self.pad, str):
+        inp="".join((chr(x) for x in a_array))
+      else:
+        inp=bytes(a_array)
+
+      inp+=self.pad[4:]
       rin_output=self.aes.encrypt(inp)
-      return ord(rin_output[0])>>7 
+
+      out=rin_output[0]
+      # Python 2 requires explicit conversion to int
+      if isinstance(out, str):
+        out=ord(out)
+
+      return out>>7 
     
     addresses=((address & mask[0]) | mask[1] for mask in self.masks)
     result=reduce(lambda x,y: x<<1 | y, (calc(a) for a in addresses),0)
@@ -46,13 +67,13 @@ class CryptoPan():
 
 if __name__=="__main__":
   import time
-  c=CryptoPan("".join((chr(x) for x in range(0,32))))
-  print "expected: 2.90.93.17"
+  c=CryptoPan("".join((_chr(x) for x in range(0,32))))
+  print("expected: 2.90.93.17")
 
-  print "calculated: "+c.anonymize("192.0.2.1")
-  print "starting performance check"
+  print("calculated: "+c.anonymize("192.0.2.1"))
+  print("starting performance check")
   stime=time.time()
   for i in range(0,1000):
     c.anonymize("192.0.2.1")
   dtime=time.time()-stime
-  print "1000 anonymizations in %s s"%dtime
+  print("1000 anonymizations in %s s"%dtime)
