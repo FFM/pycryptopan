@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-from functools import reduce
-=======
 #   pycryptopan - a python module implementing the CryptoPAn algorithm
 #   Copyright (C) 2013 - the CONFINE project
 
@@ -17,7 +14,7 @@ from functools import reduce
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
->>>>>>> 35527bd... added LICENSING information fixes #12
+from functools import reduce
 from Crypto.Cipher.AES import AESCipher as AES
 
 class CryptoPanError(Exception):
