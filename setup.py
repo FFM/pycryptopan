@@ -1,6 +1,6 @@
 from distutils.core import setup
 f=open("README")
-setup(name='pycryptopan', version='0.01c',
+setup(name='pycryptopan', version='0.01d',
             py_modules=['cryptopan'],
             install_requires=['pycrypto'],                  
             requires=['pycrypto'],                  
