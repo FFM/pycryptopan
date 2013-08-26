@@ -24,6 +24,7 @@ usage::
 Acknowledgements
 ----------------
 
-This work was funded by the EU FP7 Project `CONFINE`_
+This work was funded by the EU FP7 Project `CONFINE`_.
+Licensed under the LGPL - see the file LICENSE for details
 
 .. _CONFINE: http://www.confine-project.eu
