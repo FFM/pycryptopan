@@ -15,7 +15,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from functools import reduce
-from Crypto.Cipher.AES import AESCipher as AES
+from Crypto.Cipher.AES import new as AES
 
 class CryptoPanError(Exception):
   def __init__(self,value):
