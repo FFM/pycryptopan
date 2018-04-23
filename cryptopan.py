@@ -1,3 +1,5 @@
+#!/usr/bin/env ipython3
+
 #   pycryptopan - a python module implementing the CryptoPAn algorithm
 #   Copyright (C) 2013 - the CONFINE project
 
@@ -14,82 +16,90 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
+import sys
 from functools import reduce
 from Crypto.Cipher.AES import new as AES
+from Crypto import Random
+
 
 class CryptoPanError(Exception):
-  def __init__(self,value):
-    self.value=value
-  
-  def __str__(self):
-    return repr(self.value)
+    def __init__(self, value):
+        self.value=value
+
+    def __str__(self):
+        return repr(self.value)
+
 
 class CryptoPan():
-  
-  def __init__(self,key):
-    if len(key)!=32:
-      raise CryptoPanError("Key must be a 32 byte long string")
-    self.aes=AES(key[0:16])
-    self.pad=self.aes.encrypt(key[16:32])
+    def __init__(self, key):
+        if len(key)!=32:
+            raise CryptoPanError("Key must be a 32 byte long string")
+        self.aes=AES(key[0:16])
+        self.pad=self.aes.encrypt(key[16:32])
 
-    f4=self.pad[0:4]
-    # Python 2 requires explicit conversion to ints
-    if isinstance(f4, str):
-      f4=[ord(x) for x in f4]
-      
-    f4bp=self.toint(f4)
-    self.masks=[(mask,f4bp & (~ mask)) for mask in (0xFFFFFFFF >> (32-p) << (32-p) for p in range(0,32))]
+        f4=self.pad[0:4]
+        # Python 2 requires explicit conversion to ints
+        if isinstance(f4, str):
+            f4=[ord(x) for x in f4]
 
-  def toint(self,array):  
-    return array[0]<<24|array[1]<<16|array[2]<<8|array[3]
-  
-  def toarray(self,n):
-    for i in range(3,-1,-1):
-      yield (n>>(i*8))& 0xFF
+        f4bp=self.toint(f4)
+        self.masks=[(mask, f4bp & (~ mask)) for mask in (0xFFFFFFFF >> (32 - p) << (32 - p) for p in range(0, 32))]
 
-  def anonymize(self,ip):
-    result=0
-    address=[int(x) for x in ip.split(".")]
-    if len(address)!=4:
-      raise CryptoPanError("Invalid IPv4 Address")
-   
-    address=self.toint(address)
-    
-    def calc(a):
-      """ calculate the first bit for Crypto-PAN"""
-      a_array = self.toarray(a)
+    def toint(self, array):
+        return array[0] << 24 | array[1] <<16 | array[2] << 8 | array[3]
 
-      # Python 2 requires converting ints to chars one at a time
-      if isinstance(self.pad, str):
-        inp="".join((chr(x) for x in a_array))
-      else:
-        inp=bytes(a_array)
+    def toarray(self, n):
+        for i in range(3, -1, -1):
+            yield (n >> (i * 8)) & 0xFF
 
-      inp+=self.pad[4:]
-      rin_output=self.aes.encrypt(inp)
+    def anonymize(self, ip):
+        result=0
+        address=[int(x) for x in ip.split(".")]
+        if len(address)!=4:
+            raise CryptoPanError("Invalid IPv4 Address")
 
-      out=rin_output[0]
-      # Python 2 requires explicit conversion to int
-      if isinstance(out, str):
-        out=ord(out)
+        address=self.toint(address)
 
-      return out>>7 
-    
-    addresses=((address & mask[0]) | mask[1] for mask in self.masks)
-    result=reduce(lambda x,y: x<<1 | y, (calc(a) for a in addresses),0)
-    
-    return ".".join(["%s"%x for x in self.toarray(result ^ address)])
+        def calc(a):
+            """ calculate the first bit for Crypto-PAN"""
+            a_array = self.toarray(a)
+
+            # Python 2 requires converting ints to chars one at a time
+            if isinstance(self.pad, str):
+                inp="".join((chr(x) for x in a_array))
+            else:
+                inp=bytes(a_array)
+
+            inp+=self.pad[4:]
+            rin_output=self.aes.encrypt(inp)
+
+            out=rin_output[0]
+            # Python 2 requires explicit conversion to int
+            if isinstance(out, str):
+                out=ord(out)
+
+            return out >> 7
+
+        addresses=((address & mask[0]) | mask[1] for mask in self.masks)
+        result=reduce(lambda x, y: x << 1 | y, (calc(a) for a in addresses), 0)
+        return ".".join(["%s" % x for x in self.toarray(result ^ address)])
 
 
 if __name__=="__main__":
-  import time
-  c=CryptoPan("".join((chr(x) for x in range(0,32))))
-  print("expected: 2.90.93.17")
+    import time
+    count = int(sys.argv[1])
 
-  print("calculated: "+c.anonymize("192.0.2.1"))
-  print("starting performance check")
-  stime=time.time()
-  for i in range(0,1000):
-    c.anonymize("192.0.2.1")
-  dtime=time.time()-stime
-  print("1000 anonymizations in %s s"%dtime)
+    key = "boojahyoo3vaeToong0Eijee7Ahz3yee"        # XXX FIXME! replace by YOUR key of course
+    c=CryptoPan(key)
+    print("expected: 2.90.93.17")
+
+    print("calculated: %s " %c.anonymize("192.0.2.1"))
+    print("starting performance check")
+    stime=time.time()
+    for i in range(0, count):
+        c.anonymize("192.0.2.1")
+    dtime=time.time() - stime
+    print("%d anonymizations in %s s" %(count, dtime))
+    print("rate: %f anonymizations /sec " %(count / dtime))
