@@ -21,6 +21,13 @@ usage::
   c=CryptoPan("".join([chr(x) for x in range(0,32)]))
   print c.anonymize("192.0.2.0")
 
+
+Unittests
+=========
+
+$ python -m unittest
+
+
 Acknowledgements
 ----------------
 
