@@ -16,10 +16,9 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
-
 import sys
 from functools import reduce
+# from pycrypto module
 from Crypto.Cipher.AES import new as AES
 from Crypto import Random
 
@@ -86,20 +85,3 @@ class CryptoPan():
         result=reduce(lambda x, y: x << 1 | y, (calc(a) for a in addresses), 0)
         return ".".join(["%s" % x for x in self.toarray(result ^ address)])
 
-
-if __name__=="__main__":
-    import time
-    count = int(sys.argv[1])
-
-    key = "boojahyoo3vaeToong0Eijee7Ahz3yee"        # XXX FIXME! replace by YOUR key of course
-    c=CryptoPan(key)
-    print("expected: 2.90.93.17")
-
-    print("calculated: %s " %c.anonymize("192.0.2.1"))
-    print("starting performance check")
-    stime=time.time()
-    for i in range(0, count):
-        c.anonymize("192.0.2.1")
-    dtime=time.time() - stime
-    print("%d anonymizations in %s s" %(count, dtime))
-    print("rate: %f anonymizations /sec " %(count / dtime))
