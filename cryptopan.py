@@ -16,11 +16,10 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 from functools import reduce
 # from pycrypto module
 from Crypto.Cipher.AES import new as AES
-from Crypto import Random
+# from Crypto import Random
 
 
 class CryptoPanError(Exception):
@@ -84,4 +83,3 @@ class CryptoPan():
         addresses=((address & mask[0]) | mask[1] for mask in self.masks)
         result=reduce(lambda x, y: x << 1 | y, (calc(a) for a in addresses), 0)
         return ".".join(["%s" % x for x in self.toarray(result ^ address)])
-
